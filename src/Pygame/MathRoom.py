@@ -2,6 +2,7 @@ import Pygame.GlobalVariables as GVar
 import Pygame.Updater as Updater
 import pygame
 import pygame.draw
+from Pygame.Button import Button
 
 
 ratio = (0.85, 0.7) # The ratio of the size of the functionCanvasSurface compared to the main screen
@@ -22,7 +23,16 @@ class CanvasSurface():
         # Drawing end
         GVar.mainScreenBuffer.blit(functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * ratio[0] / 2), 50]) # Draws into the main screen buffer in the middle.
 
+class MainSurface():
 
-        
+    def update():
+        buttonList = []
+        buttonList.append(Button(GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0)))
+
+        # Draws buttons and detects any button press
+        for button in buttonList:
+            button.update()
+
 def initRoom():
     Updater.insertUpdate(CanvasSurface)
+    Updater.insertUpdate(MainSurface)
