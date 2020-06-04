@@ -112,7 +112,7 @@ class TextField:
                         pass
 
                     elif (event.unicode != ''): # If unicode is not empty then
-                        self.text += event.unicode
+                        self.text = self.text[0:self.cursorPos] + event.unicode + self.text[self.cursorPos:]
                         self.cursorPos += 1
 
                     blink = True # Sets blink to true if any key is pressed
@@ -120,7 +120,7 @@ class TextField:
                     self.buttonHeld = False
 
             # If the backspace or arrow keys are held
-            if (self.buttonHeld != False and bool((time() // (200 / 1000)) % 2)):
+            if (self.buttonHeld != False and bool((time() // (300 / 1000)) % 2)):
                 blink = True
                 if (self.buttonHeld == "l"):
                     self.cursorPos = clamp(self.cursorPos - 1, 0, len(self.text))
@@ -128,7 +128,7 @@ class TextField:
                     self.cursorPos = clamp(self.cursorPos + 1, 0, len(self.text))
                 else:
                     self.text = self.text[0:self.cursorPos-1] + self.text[self.cursorPos:] # Deletes the text based on where the cursor position is.
-                    self.cursorPos -= 1            
+                    self.cursorPos -= 1
 
             # Moves the text location in the x axis, based on the cursor relative position in the text field.
             if (self.xCursorPos > self.length * 0.75):
