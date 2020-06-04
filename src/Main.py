@@ -4,6 +4,7 @@ import pygame
 import pygame.display
 import pygame.draw
 import Pygame.GlobalVariables as GVar
+from time import time, sleep
 
 # Initialize the pygame engine.
 pygame.init()
@@ -19,7 +20,11 @@ import Pygame.MathRoom as MathRoom
 # Initialize main room in the display
 MathRoom.initRoom()
 
+fpsLock = 60
+
 while True:
+
+    startTime = time()
 
     # Update global variables
     GVar.update()
@@ -45,3 +50,8 @@ while True:
 
     # Updates the display
     pygame.display.flip()
+
+    # Function to lock fps to 60, to save lots of processing power
+    deltaFrame = (time() - startTime) # Time to process one frame
+    oneFrame = (1 / fpsLock) - deltaFrame if (1 / fpsLock) - deltaFrame > 0 else 0 # Clamps sleep value not to be below 0
+    sleep(oneFrame)
