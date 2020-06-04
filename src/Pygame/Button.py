@@ -87,28 +87,30 @@ class Button:
 
         self._updated = False
 
-        # Checks if mouse hovers over the button
-        mousePos = GVar.mousePos
-        if ((mousePos[0] > self.coords[0] and mousePos[0] < (self.coords[0] + self.size[0])) and (mousePos[1] > self.coords[1] and mousePos[1] < (self.coords[1] + self.size[1]))):
-            if (not self.hovered):
-                self._updated = True
-            self.hovered = True
+        if (self.hoverAnim or GVar.mouseStateSingle[0] == 1):
+            # Checks if mouse hovers over the button
+            mousePos = GVar.mousePos
+            if ((mousePos[0] > self.coords[0] and mousePos[0] < (self.coords[0] + self.size[0])) and (mousePos[1] > self.coords[1] and mousePos[1] < (self.coords[1] + self.size[1]))):
+                if (not self.hovered):
+                    self._updated = True
+                self.hovered = True
 
-            if (GVar.mouseStateSingle[0] == 1):
-                # Do action when clicked
-                self.funcToRun()
-        else:
-            if (self.hovered):
-                self._updated = True
-            self.hovered = False
+                if (GVar.mouseStateSingle[0] == 1):
+                    # Do action when clicked
+                    self.funcToRun()
+            else:
+                if (self.hovered):
+                    self._updated = True
+                self.hovered = False
 
         # Do on hover actions
-        if (self._updated and self.hovered):
-            self.color = self.hoverColor
-            self.redrawButton()
+        if (self.hoverAnim):
+            if (self._updated and self.hovered):
+                self.color = self.hoverColor
+                self.redrawButton()
 
-        elif (self._updated and (not self.hovered)):
-            self.color = self.initColor
-            self.redrawButton()
+            elif (self._updated and (not self.hovered)):
+                self.color = self.initColor
+                self.redrawButton()
 
         self.surfaceToDraw.blit(self.surface, self.coords) # Draw to screen
