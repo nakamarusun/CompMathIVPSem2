@@ -3,6 +3,7 @@ import Pygame.Updater as Updater
 import pygame
 import pygame.draw
 from Pygame.Button import Button
+from Pygame.Slider import Slider
 
 
 class CanvasSurface():
@@ -31,17 +32,18 @@ class CanvasSurface():
 
 class MainSurface():
 
-    buttonList = []
+    interactableList = []
 
     def __init__(self):
-        self.buttonList = [] # Initiates buttonList
+        self.interactableList = [] # Initiates interactableList
         # Adds all of the button
-        self.buttonList.append(Button(lambda : print("Button Clicked"), GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
+        self.interactableList.append(Button(lambda : print("Button Clicked"), GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
+        self.interactableList.append(Slider(GVar.mainScreenBuffer, [300, 300], 300))
 
     def update(self):
         # Draws buttons and detects any button press
-        for button in self.buttonList:
-            button.update()
+        for interactable in self.interactableList:
+            interactable.update()
 
 def initRoom():
     Updater.insertUpdate(CanvasSurface())

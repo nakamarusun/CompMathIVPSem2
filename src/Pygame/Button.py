@@ -72,13 +72,16 @@ class Button:
         self.surfaceToDraw = surface
         self.hoverColor = hoverColor
         self.funcToRun = funcToRun
+        self.hoverAnim = hoverAnim
 
         self.color = color
+        
+        self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
 
         self.redrawButton()
 
     def redrawButton(self):
-        self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.surface.fill((255, 255, 255, 0))
         AAfilledRoundedRect(self.surface, self.surface.get_rect(), self.color, 0.3) # Draws button rectangle.
         textSurf = self.font.render(self.text, True, (255, 255, 255))
         self.surface.blit(textSurf, ((self.size[0] / 2) - (textSurf.get_rect().width / 2), (self.size[1] / 2) - (textSurf.get_rect().height / 2))) # Draws text in the middle

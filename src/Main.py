@@ -45,7 +45,6 @@ while True:
     # Main operations
     Updater.updateAll()
 
-
     # End of main operations
 
     # Updates the display
@@ -53,5 +52,6 @@ while True:
 
     # Function to lock fps to 60, to save lots of processing power
     deltaFrame = (time() - startTime) # Time to process one frame
+    # print(1/deltaFrame if deltaFrame != 0 else "inf") # Uncomment to show fps
     oneFrame = (1 / fpsLock) - deltaFrame if (1 / fpsLock) - deltaFrame > 0 else 0 # Clamps sleep value not to be below 0
     sleep(oneFrame)
