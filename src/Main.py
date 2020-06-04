@@ -30,10 +30,13 @@ while True:
     GVar.update()
 
     # Preliminary event getter
-    for event in pygame.event.get():
+    GVar.events = pygame.event.get() # Puts into variable for easy access by other files
+    for event in GVar.events:
+        # Quit event
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        # Resize event
         if event.type == pygame.VIDEORESIZE:
             GVar.isVideoResized = True
             GVar.resolution = [event.w, event.h]
@@ -54,4 +57,5 @@ while True:
     deltaFrame = (time() - startTime) # Time to process one frame
     # print(1/deltaFrame if deltaFrame != 0 else "inf") # Uncomment to show fps
     oneFrame = (1 / fpsLock) - deltaFrame if (1 / fpsLock) - deltaFrame > 0 else 0 # Clamps sleep value not to be below 0
-    sleep(oneFrame)
+    if (oneFrame != 0):
+        pygame.time.wait(round(oneFrame * 1000))

@@ -56,19 +56,22 @@ class Slider:
         
         if (GVar.mouseState[0] == 1):
             # Checks whether the mouse cursor is at the slider's "ball"
+            # If mouse is clicked and mouse is in the slider's "ball"
             if (((self.coords[0] + self.sliderPos - self.sliderRadius) < GVar.mousePos[0] and (self.coords[0] + self.sliderPos + self.sliderRadius) > GVar.mousePos[0]) and 
              (self.coords[1] + (self.surfHeight/2) - self.sliderRadius) < GVar.mousePos[1] and (self.coords[1] + (self.surfHeight/2) + self.sliderRadius) > GVar.mousePos[1] ):
-                self._dragged = True
+                self._dragged = True # Sets dragged to true
+
+        # Sets the slider ball to stop following the mouse and stay in position
         elif (self._dragged):
             self._dragged = False
             self.sliderColor = self.sliderColorInit
             self.redrawSurface()
 
+        # Sets the slider ball to follow the mouse
         if (self._dragged):
-            self.sliderPos = clamp(GVar.mousePos[0] - self.coords[0], self.sliderRadius, self.length + self.sliderRadius)
-            self.value = (self.sliderPos - self.sliderRadius) / self.length
-            self.sliderColor = self.sliderDraggedColor
-            self.redrawSurface()
+            self.sliderPos = clamp(GVar.mousePos[0] - self.coords[0], self.sliderRadius, self.length + self.sliderRadius) # Sets ball position
+            self.value = (self.sliderPos - self.sliderRadius) / self.length # Value of the slider
+            self.sliderColor = self.sliderDraggedColor # Change color
+            self.redrawSurface() # Redraw surface to update the image
 
-
-        self.surfaceToDraw.blit(self.surface, self.coords)
+        self.surfaceToDraw.blit(self.surface, self.coords) # Draws into main screen buffer

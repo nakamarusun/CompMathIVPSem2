@@ -4,7 +4,8 @@ import pygame.font
 pygame.font.init()
 
 resolution = [800, 600]
-defFont = pygame.font.Font(pygame.font.get_default_font(), 14)
+# defFont = pygame.font.Font(pygame.font.get_default_font(), 12)
+defFont = pygame.font.SysFont("Arial Regular", 18, False, False, None)
 
 mainScreenBuffer = None
 isVideoResized = False
@@ -12,6 +13,8 @@ isVideoResized = False
 mousePos = [0, 0]
 mouseState = [0, 0, 0]
 mouseStateSingle = [0, 0, 0]
+
+events = []
 
 def update():
 
