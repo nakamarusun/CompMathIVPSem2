@@ -35,9 +35,8 @@ class MainSurface():
 
     def __init__(self):
         self.buttonList = [] # Initiates buttonList
-
         # Adds all of the button
-        self.buttonList.append(Button(GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
+        self.buttonList.append(Button(lambda : print("Button Clicked"), GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
 
     def update(self):
         # Draws buttons and detects any button press

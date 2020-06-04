@@ -52,6 +52,7 @@ class Button:
     coords = []
     font = None
     surfaceToDraw = None
+    funcToRun = None
 
     hoverAnim = False
     hoverColor = (0, 0, 0)
@@ -62,7 +63,7 @@ class Button:
 
     hovered = False
 
-    def __init__(self, surface, coords, text, font, size, color, hoverAnim=False, hoverColor=(0, 0, 0)):
+    def __init__(self, funcToRun, surface, coords, text, font, size, color, hoverAnim=False, hoverColor=(0, 0, 0)):
         self.text = text
         self.size = size
         self.initColor = color
@@ -70,6 +71,7 @@ class Button:
         self.font = font
         self.surfaceToDraw = surface
         self.hoverColor = hoverColor
+        self.funcToRun = funcToRun
 
         self.color = color
 
@@ -94,7 +96,7 @@ class Button:
 
             if (GVar.mouseStateSingle[0] == 1):
                 # Do action when clicked
-                pass
+                self.funcToRun()
         else:
             if (self.hovered):
                 self._updated = True
@@ -108,7 +110,5 @@ class Button:
         elif (self._updated and (not self.hovered)):
             self.color = self.initColor
             self.redrawButton()
-
-        print(self._updated)
 
         self.surfaceToDraw.blit(self.surface, self.coords) # Draw to screen
