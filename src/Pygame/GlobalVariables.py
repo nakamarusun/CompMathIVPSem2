@@ -31,4 +31,3 @@ def update():
             mouseStateSingle[i] = 0
 
     mouseState = tempMouseState
-    print(mouseStateSingle)

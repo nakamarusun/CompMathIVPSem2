@@ -47,20 +47,31 @@ class Button:
 
     text = ""
     size = []
-    color = []
+    initColor = (255, 255, 255)
+    color = (255, 255, 255)
     coords = []
     font = None
     surfaceToDraw = None
 
+    hoverAnim = False
+    hoverColor = (0, 0, 0)
+
     surface = None
 
-    def __init__(self, surface, coords, text, font, size, color):
+    _updated = False
+
+    hovered = False
+
+    def __init__(self, surface, coords, text, font, size, color, hoverAnim=False, hoverColor=(0, 0, 0)):
         self.text = text
         self.size = size
-        self.color = color
+        self.initColor = color
         self.coords = coords
         self.font = font
         self.surfaceToDraw = surface
+        self.hoverColor = hoverColor
+
+        self.color = color
 
         self.redrawButton()
 
@@ -71,4 +82,33 @@ class Button:
         self.surface.blit(textSurf, ((self.size[0] / 2) - (textSurf.get_rect().width / 2), (self.size[1] / 2) - (textSurf.get_rect().height / 2))) # Draws text in the middle
 
     def update(self):
+
+        self._updated = False
+
+        # Checks if mouse hovers over the button
+        mousePos = GVar.mousePos
+        if ((mousePos[0] > self.coords[0] and mousePos[0] < (self.coords[0] + self.size[0])) and (mousePos[1] > self.coords[1] and mousePos[1] < (self.coords[1] + self.size[1]))):
+            if (not self.hovered):
+                self._updated = True
+            self.hovered = True
+
+            if (GVar.mouseStateSingle[0] == 1):
+                # Do action when clicked
+                pass
+        else:
+            if (self.hovered):
+                self._updated = True
+            self.hovered = False
+
+        # Do on hover actions
+        if (self._updated and self.hovered):
+            self.color = self.hoverColor
+            self.redrawButton()
+
+        elif (self._updated and (not self.hovered)):
+            self.color = self.initColor
+            self.redrawButton()
+
+        print(self._updated)
+
         self.surfaceToDraw.blit(self.surface, self.coords) # Draw to screen
