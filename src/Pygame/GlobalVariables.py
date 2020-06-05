@@ -5,7 +5,7 @@ pygame.font.init()
 
 resolution = [800, 600]
 # defFont = pygame.font.Font(pygame.font.get_default_font(), 12)
-defFont = pygame.font.SysFont("Arial Regular", 18, False, False, None)
+defFont = pygame.font.SysFont("Calibri", 14, False, False, None)
 
 mainScreenBuffer = None
 isVideoResized = False
