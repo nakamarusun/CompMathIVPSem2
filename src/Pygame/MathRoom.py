@@ -15,9 +15,28 @@ class CanvasSurface():
     ratio = []
     functionCanvasSurface = None
 
+    function = lambda self, x : 2*x - 4
+    y0 = 2
+    until = 5
+    h = 0.1
+
+    xArr = [] # The x plot in the graph.
+    yArr = [] # The y plot in the graph.
+
+    yMax = 0 
+    yMin = 0
+
     def __init__(self):
         self.ratio = (0.85, 0.7) # The ratio of the size of the functionCanvasSurface compared to the main screen
+        self.updateFunction()
         self.redrawSurface()
+
+    def updateFunction(self):
+        self.xArr, self.yArr = MathUtil.IVP.compute(self.function, self.h, self.until, self.y0)
+        self.yMax = max(self.yArr)
+        self.yMin = min(self.yArr)
+        print(self.xArr, "\n", self.yArr)
+        print(self.yMin, "\n", self.yMax)
 
     def redrawSurface(self):
         # Creates a new function canvas surface with 85% width size and 50% height size
@@ -25,6 +44,13 @@ class CanvasSurface():
         self.functionCanvasSurface.fill((255, 255, 255)) # Clears the surface with white
         pygame.draw.rect(self.functionCanvasSurface, (0, 0, 0), self.functionCanvasSurface.get_rect(), 1) # Puts a white border in the canvas
         # Do all drawing here
+
+        pointBefore = [ 0, self.ratio[1] * GVar.resolution[1] * (1 - MathUtil.invLerp(self.yArr[0], self.yMin, self.yMax)) ] # Sets the first dot of the graphic
+        for i in range(len(self.xArr) - 1):
+            pointAfter = [ MathUtil.invLerp(self.xArr[i + 1], self.xArr[0], self.xArr[-1]) * GVar.resolution[0] * self.ratio[0], ( 1 - MathUtil.invLerp(self.yArr[i + 1], self.yMin, self.yMax)) * GVar.resolution[1] * self.ratio[1] ] # Counts the current dot.
+            pygame.draw.line(self.functionCanvasSurface, (0, 0, 0), pointBefore, pointAfter, 2) # Draws line from the previous dot to the dot after it
+            pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the dot in each of the delta x's
+            pointBefore = pointAfter # Sets the previous dot to the current dot.
 
     def update(self):
         if (GVar.isVideoResized):

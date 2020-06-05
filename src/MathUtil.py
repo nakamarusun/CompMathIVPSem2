@@ -15,7 +15,7 @@ class IVP:
         for i in range(int(until / h)):
             curX += h
             x = curX
-            curY = curY + (h * eval(f))
+            curY = curY + (h * f(curX))
             xVal.append(curX)
             yVal.append(curY)
 
@@ -33,3 +33,9 @@ def getWidthResolutionRatio(ratio):
 
 def getLengthResolutionRatio(ratio):
     return GVar.resolution[1] * ratio
+
+def lerp(val, min, max):
+    return (min + val * (max - min))
+
+def invLerp(val, min, max):
+    return ((val - min) / (max - min))
