@@ -3,24 +3,28 @@ import pygame
 
 class TextLabel:
 
-    self.coords = [0, 0]
-    self.surfaceToDraw = None
-    self.text = ""
-    self.font = None
+    coords = [0, 0]
+    surfaceToDraw = None
+    text = ""
+    font = None
 
-    self.surface = None
+    textColor = (0, 0, 0)
 
-    def __init__(self, surface, text, coords, font=GVar.defFont):
+    surface = None
+
+    def __init__(self, surface, text, coords, font=GVar.defFont, textColor=(0, 0, 0)):
         self.coords = coords
         self.surfaceToDraw = surface
         self.text = text
         self.font = font
 
+        self.textColor = textColor
+
         self.redrawSurface()
 
     def redrawSurface(self):
         self.surface = pygame.Surface(self.font.size(self.text), pygame.SRCALPHA) # Recreate surface with the text size
-        self.surface.blit(self.font.render(self.text), [0, 0]) # Renders the text to surface
+        self.surface.blit(self.font.render(self.text, True, self.textColor), [0, 0]) # Renders the text to surface
 
     def changeText(self, newText):
         self.text = newText

@@ -39,7 +39,7 @@ while True:
         # Resize event
         if event.type == pygame.VIDEORESIZE:
             GVar.isVideoResized = True
-            GVar.resolution = [MathUtil.clamp(event.w, 400, 20000), MathUtil.clamp(event.h, 300, 20000 )]
+            GVar.resolution = [MathUtil.clamp(event.w, 600, 20000), MathUtil.clamp(event.h, 450, 20000 )]
             GVar.mainScreenBuffer = pygame.display.set_mode(GVar.resolution, pygame.RESIZABLE)
 
     # Clears the mainScreen Buffer

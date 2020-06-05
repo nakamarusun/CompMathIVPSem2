@@ -30,7 +30,9 @@ class TextField:
 
     buttonHeld = False # Whether the arrow button or the backspace is active.
 
-    def __init__(self, surface, length, coords, font, backgroundColor=(240, 240, 240), textColor=(0, 0, 0), margin=[5,5]):
+    enterFunc = None # Function to run when enter is pressed here.
+
+    def __init__(self, enterFunc, surface, length, coords, font, backgroundColor=(245, 245, 245), textColor=(0, 0, 0), margin=[5,5], initText=""):
 
         self.length = length
         self.coords = coords
@@ -45,6 +47,10 @@ class TextField:
         self.size = [length, self.font.get_height() + margin[1]*2]
 
         self.surface = pygame.Surface(self.size) # Draws surface
+
+        self.enterFunc = enterFunc
+
+        self.text = initText
         
         self.redrawSurface()
 
@@ -76,6 +82,7 @@ class TextField:
                 # Where the mouse clicks, translate into cursor position
             else:
                 self._active = False
+                self.redrawSurface()
 
         if (self._active):
 
@@ -108,7 +115,7 @@ class TextField:
                         self.buttonHeld = "r"
 
                     elif (event.unicode == '\r' or event.unicode == '\n'): # If enter is clicked
-                        pass
+                        self.enterFunc()
 
                     elif (event.unicode != ''): # If unicode is not empty then
                         self.text = self.text[0:self.cursorPos] + event.unicode + self.text[self.cursorPos:]

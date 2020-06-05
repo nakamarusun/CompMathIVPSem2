@@ -1,3 +1,4 @@
+import Pygame.GlobalVariables as GVar
 
 class IVP:
     def f(x: float):
@@ -26,3 +27,9 @@ def clamp(val, min, max):
     elif (val > max):
         return max
     return val
+
+def getWidthResolutionRatio(ratio):
+    return GVar.resolution[0] * ratio
+
+def getLengthResolutionRatio(ratio):
+    return GVar.resolution[1] * ratio

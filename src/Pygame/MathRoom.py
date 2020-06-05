@@ -5,6 +5,7 @@ import pygame.draw
 from Pygame.Button import Button
 from Pygame.Slider import Slider
 from Pygame.TextField import TextField
+from Pygame.TextLabel import TextLabel
 
 
 class CanvasSurface():
@@ -14,6 +15,7 @@ class CanvasSurface():
 
     def __init__(self):
         self.ratio = (0.85, 0.7) # The ratio of the size of the functionCanvasSurface compared to the main screen
+        self.redrawSurface()
 
     def redrawSurface(self):
         # Creates a new function canvas surface with 85% width size and 50% height size
@@ -34,13 +36,39 @@ class MainSurface():
     interactableList = []
 
     def __init__(self):
-        self.interactableList = [] # Initiates interactableList
-        # Adds all of the button
-        self.interactableList.append(Button(lambda : print("Button Clicked"), GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
-        self.interactableList.append(Slider(GVar.mainScreenBuffer, [300, 200], 300))
-        self.interactableList.append(TextField(GVar.mainScreenBuffer, 300, [400, 300], GVar.defFont))
+        self.redrawAll()
+
+        # Samples
+        # self.interactableList.append(Button(lambda : print("Button Clicked"), GVar.mainScreenBuffer, [100, 100], "yes", GVar.defFont, [150, 100], (255, 0, 0), True))
+        # self.interactableList.append(Slider(GVar.mainScreenBuffer, [300, 200], 300))
+        # self.interactableList.append(TextField(lambda : print("Enter Clicked"), GVar.mainScreenBuffer, 300, [400, 300], GVar.defFont))
+        
+    def redrawAll(self):
+        self.interactableList = []
+
+        # Sliders
+        self.interactableList.append(Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.84], GVar.resolution[0] * 0.3, 50, (191, 233, 245), (141, 202, 235))) # Delta X Slider
+        self.interactableList.append(Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.91], GVar.resolution[0] * 0.3, 20, (252, 215, 251), (220, 141, 235), (142, 47, 189), (185, 51, 222))) # Until X Slider
+
+        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Delta X:", [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.82])) # Delta X Text
+        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Until X:", [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.89])) # Until X Text
+
+        self.interactableList.append(TextField(lambda : print("Pressed"), GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.84 - 3], GVar.defFont)) # Delta X TextField
+        self.interactableList.append(TextField(lambda : print("Pressed"), GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.91 - 3], GVar.defFont)) # Until X TextField
+
+        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Function:", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.84 - 2], GVar.defFont18Bold)) # Function Text
+
+        self.interactableList.append(TextField(lambda : print("Pressed"), GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18)) # Function TextField
+
+        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "y(0):", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.91 - 2], GVar.defFont18)) # Initial y Text
+
+        self.interactableList.append(TextField(lambda : print("Pressed"), GVar.mainScreenBuffer, GVar.resolution[0] * 0.075, [GVar.resolution[0] * 0.56, GVar.resolution[1] * 0.91 - 9], GVar.defFont18)) # Initial y TextField
+
+        self.interactableList.append(Button(lambda : print("Calculated"), GVar.mainScreenBuffer, [GVar.resolution[0] * 0.8, GVar.resolution[1] * 0.91 - 9], "Calculate", GVar.defFont, [GVar.resolution[0] * 0.125, 29], (219, 42, 110), True, (227, 64, 145)))
 
     def update(self):
+        if (GVar.isVideoResized):
+            self.redrawAll()
         # Draws buttons and detects any button press
         for interactable in self.interactableList:
             interactable.update()
