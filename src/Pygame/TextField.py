@@ -83,7 +83,6 @@ class TextField:
 
             # If the textfield is active, then listen for keyboard strokes
             for event in GVar.events:
-                print(event)
                 if (event.type == pygame.KEYDOWN):
                     if (event.unicode == '\x08'): # If the unicode is backspace then
                         if (len(self.text) != 0): # Checks if there is something in the text
@@ -108,7 +107,7 @@ class TextField:
                         self.cursorPos = clamp(self.cursorPos + 1, 0, len(self.text))
                         self.buttonHeld = "r"
 
-                    elif (event.key == '\r' or event.key == '\n'): # If enter is clicked
+                    elif (event.unicode == '\r' or event.unicode == '\n'): # If enter is clicked
                         pass
 
                     elif (event.unicode != ''): # If unicode is not empty then
@@ -119,8 +118,7 @@ class TextField:
                 elif (event.type == pygame.KEYUP):
                     self.buttonHeld = False
 
-            # If the backspace or arrow keys are held
-            if (self.buttonHeld != False and bool((time() // (300 / 1000)) % 2)):
+            if (self.buttonHeld != False and (GVar.framesSinceStart % 8 == 0)):
                 blink = True
                 if (self.buttonHeld == "l"):
                     self.cursorPos = clamp(self.cursorPos - 1, 0, len(self.text))

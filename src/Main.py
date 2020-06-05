@@ -39,7 +39,7 @@ while True:
         # Resize event
         if event.type == pygame.VIDEORESIZE:
             GVar.isVideoResized = True
-            GVar.resolution = [event.w, event.h]
+            GVar.resolution = [MathUtil.clamp(event.w, 400, 20000), MathUtil.clamp(event.h, 300, 20000 )]
             GVar.mainScreenBuffer = pygame.display.set_mode(GVar.resolution, pygame.RESIZABLE)
 
     # Clears the mainScreen Buffer
@@ -59,3 +59,5 @@ while True:
     oneFrame = (1 / fpsLock) - deltaFrame if (1 / fpsLock) - deltaFrame > 0 else 0 # Clamps sleep value not to be below 0
     if (oneFrame != 0):
         pygame.time.wait(round(oneFrame * 1000))
+
+    GVar.framesSinceStart += 1 # Adds frames since start by 1

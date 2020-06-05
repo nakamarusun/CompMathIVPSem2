@@ -16,6 +16,8 @@ mouseStateSingle = [0, 0, 0]
 
 events = []
 
+framesSinceStart = 0
+
 def update():
 
     global mousePos

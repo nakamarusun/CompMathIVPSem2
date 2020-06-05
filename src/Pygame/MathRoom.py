@@ -15,21 +15,19 @@ class CanvasSurface():
     def __init__(self):
         self.ratio = (0.85, 0.7) # The ratio of the size of the functionCanvasSurface compared to the main screen
 
+    def redrawSurface(self):
         # Creates a new function canvas surface with 85% width size and 50% height size
         self.functionCanvasSurface = pygame.Surface((GVar.resolution[0] * self.ratio[0], GVar.resolution[1] * self.ratio[1]))
-
-    def update(self):
-        if (GVar.isVideoResized):
-            self.functionCanvasSurface = pygame.Surface((GVar.resolution[0] * self.ratio[0], GVar.resolution[1] * self.ratio[1])) # If program is resized, change the size of the canvas surface
-        
         self.functionCanvasSurface.fill((255, 255, 255)) # Clears the surface with white
         pygame.draw.rect(self.functionCanvasSurface, (0, 0, 0), self.functionCanvasSurface.get_rect(), 1) # Puts a white border in the canvas
         # Do all drawing here
 
-
+    def update(self):
+        if (GVar.isVideoResized):
+            self.redrawSurface() # If program is resized, change the size of the canvas surface
 
         # Drawing end
-        GVar.mainScreenBuffer.blit(self.functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * self.ratio[0] / 2), 50]) # Draws into the main screen buffer in the middle.
+        GVar.mainScreenBuffer.blit(self.functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * self.ratio[0] / 2), GVar.resolution[1] * 0.1]) # Draws into the main screen buffer in the middle.
 
 class MainSurface():
 
