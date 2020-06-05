@@ -77,7 +77,13 @@ class MainSurface():
 
         # Calculate Button
         self.interactableList.append(Button(lambda : print("Calculated"),
-         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.8, GVar.resolution[1] * 0.91 - 9], "CALCULATE", GVar.defFont, [GVar.resolution[0] * 0.125, 29], (219, 42, 110), True, (227, 64, 145)))
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.83, GVar.resolution[1] * 0.91 - 9], "CALCULATE", GVar.defFont, [GVar.resolution[0] * 0.095, 29], (219, 42, 110), True, (227, 64, 145)))
+
+        # Toggle buttons for calculation Methods
+        self.interactableList.append(ToggleButton(lambda : print("Calculated"),
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65, GVar.resolution[1] * 0.91 - 9], "Euler", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104)))
+        self.interactableList.append(ToggleButton(lambda : print("Calculated"),
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "Runge-Kutta", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104)))
 
 
 
