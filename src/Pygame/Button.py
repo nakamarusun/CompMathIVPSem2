@@ -63,6 +63,8 @@ class Button:
 
     hovered = False
 
+    pressed = False
+
     def __init__(self, funcToRun, surface, coords, text, font, size, color, hoverAnim=False, hoverColor=(0, 0, 0)):
         self.text = text
         self.size = size
@@ -101,6 +103,7 @@ class Button:
                 if (GVar.mouseStateSingle[0] == 1):
                     # Do action when clicked
                     self.funcToRun()
+                    self.pressed = not self.pressed
             else:
                 if (self.hovered):
                     self._updated = True
