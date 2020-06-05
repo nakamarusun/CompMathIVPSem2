@@ -8,17 +8,17 @@ from Pygame.TextField import TextField
 from Pygame.TextLabel import TextLabel
 from Pygame.ToggleButton import ToggleButton
 import MathUtil
-
+import math
 
 class CanvasSurface():
 
     ratio = []
     functionCanvasSurface = None
 
-    function = lambda self, x : 2*x - 4
+    function = lambda self, x : x**2 + 6*x + 9
     y0 = 2
     until = 5
-    h = 0.1
+    h = 1
 
     xArr = [] # The x plot in the graph.
     yArr = [] # The y plot in the graph.
@@ -33,12 +33,16 @@ class CanvasSurface():
 
     def updateFunction(self):
         self.xArr, self.yArr = MathUtil.IVP.compute(self.function, self.h, self.until, self.y0)
-        self.yMax = max(self.yArr) + 1
-        self.yMin = min(self.yArr) - 1
+        self.yMax = max(self.yArr)
+        self.yMin = min(self.yArr)
+        range = self.yMax - self.yMin
+        self.yMax += range * 0.05
+        self.yMin -= range * 0.05
         # print(self.xArr, "\n", self.yArr)
-        print(self.yMin, "\n", self.yMax)
+        # print(self.yMin, "\n", self.yMax)
 
     def redrawSurface(self):
+        self.updateFunction()
         # Creates a new function canvas surface with 85% width size and 50% height size
         self.functionCanvasSurface = pygame.Surface((GVar.resolution[0] * self.ratio[0], GVar.resolution[1] * self.ratio[1]))
         self.functionCanvasSurface.fill((255, 255, 255)) # Clears the surface with white
@@ -52,14 +56,18 @@ class CanvasSurface():
             pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the dot in each of the delta x's
             pointBefore = pointAfter # Sets the previous dot to the current dot.
 
+        pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the last dot
+
     def drawNumbers(self):
-        yNumbers = (self.yMax - self.yMin) / 10
+        # Draws the number in the y axis, 20 numbers
+        yNumbers = (self.yMax - self.yMin) / 20
         counter = self.yMin
-        for i in range(10):
+        for i in range(20):
             GVar.mainScreenBuffer.blit(GVar.defFont.render(str(round(counter, 3)) + " -", True, (0, 0, 0)),
             [((1 - self.ratio[0])/2 * GVar.resolution[0]) - 40, (((0.1 + self.ratio[1]) * GVar.resolution[1]) - (MathUtil.invLerp(counter, self.yMin, self.yMax) * (GVar.resolution[1] * self.ratio[1])) - 7)])
             counter += yNumbers
 
+        # Draws the number in the x axis, 10 numbers
         xNumbers = (self.xArr[-1] - self.xArr[0]) / 10
         counter = self.xArr[0]
         for i in range(11):
@@ -106,9 +114,9 @@ class MainSurface():
         self.interactableList = []
 
         # Sliders
-        self.deltaXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.84], GVar.resolution[0] * 0.3, 0.5, (191, 233, 245), (141, 202, 235))
+        self.deltaXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.84], GVar.resolution[0] * 0.3, canvasSurface.h/2, (191, 233, 245), (141, 202, 235))
         self.interactableList.append(self.deltaXSlider) # Delta X Slider
-        self.untilXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.91], GVar.resolution[0] * 0.3, 0.2, (252, 215, 251), (220, 141, 235), (142, 47, 189), (185, 51, 222))
+        self.untilXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.91], GVar.resolution[0] * 0.3, canvasSurface.until/20, (252, 215, 251), (220, 141, 235), (142, 47, 189), (185, 51, 222))
         self.interactableList.append(self.untilXSlider) # Until X Slider
 
         # Slider Text
@@ -117,10 +125,10 @@ class MainSurface():
 
         # Slider TextField
         self.deltaXTextField = TextField(self.renewXSlider,
-         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.84 - 3], GVar.defFont)
+         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.84 - 3], GVar.defFont, initText=str(canvasSurface.h))
         self.interactableList.append(self.deltaXTextField) # Delta X TextField
         self.untilXTextField = TextField(self.renewUntilX,
-         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.91 - 3], GVar.defFont)
+         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.91 - 3], GVar.defFont, initText=str(canvasSurface.until))
         self.interactableList.append(self.untilXTextField) # Until X TextField
 
         # Function Text
@@ -135,8 +143,8 @@ class MainSurface():
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "y(0):", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.91 - 2], GVar.defFont18))
 
         # Initial y TextField
-        self.initialYTextField = TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, GVar.resolution[0] * 0.075, [GVar.resolution[0] * 0.56, GVar.resolution[1] * 0.91 - 9], GVar.defFont18)
+        self.initialYTextField = TextField(self.renewY0,
+         GVar.mainScreenBuffer, GVar.resolution[0] * 0.075, [GVar.resolution[0] * 0.56, GVar.resolution[1] * 0.91 - 9], GVar.defFont18, initText=str(canvasSurface.y0))
         self.interactableList.append(self.initialYTextField)
 
         # Calculate Button
@@ -155,8 +163,25 @@ class MainSurface():
     def update(self):
         # Do all checks here
 
+        # If the delta x slider is dragged
         if (self.deltaXSlider.dragged):
-            self.deltaXTextField.text = str(round(self.deltaXSlider.value, 3))
+            self.deltaXTextField.text = str(round(MathUtil.clamp(self.deltaXSlider.value * 2, 0.01, math.inf), 3))
+            canvasSurface.redrawSurface()
+
+        # If the until slider is dragged
+        if (self.untilXSlider.dragged):
+            self.untilXTextField.text = str(round(self.untilXSlider.value * 20, 3))
+            canvasSurface.redrawSurface()
+        
+        try:
+            canvasSurface.h = float(self.deltaXTextField.text)
+        except:
+            pass
+        try:
+            canvasSurface.until = float(self.untilXTextField.text)
+        except:
+            pass
+
         # End actions
 
         if (GVar.isVideoResized):
@@ -165,24 +190,42 @@ class MainSurface():
         for interactable in self.interactableList:
             interactable.update()
 
+        if (GVar.divisionByZero):
+            GVar.mainScreenBuffer.blit(GVar.defFont24Bold.render("ERROR, DIVISION BY ZERO. CHANGE VALUE", True, (255, 0, 0)), [20, 20])
+
     def renewXSlider(self):
         try:
-            self.deltaXSlider.value = MathUtil.clamp(float(self.deltaXTextField.text), 0.0, 1.0)
+            if (float(self.deltaXTextField.text) < 0.01):
+                self.deltaXTextField.text = "0.01"
+            self.deltaXSlider.value = MathUtil.clamp(float(self.deltaXTextField.text) / 2, 0.0, 1.0)
         except:
-            self.deltaXSlider.value = 0.5
-            self.deltaXTextField.text = 0.5
+            self.deltaXSlider.value = 0.1
+            self.deltaXTextField.text = "0.1"
         self.deltaXSlider.updateSliderPos()
         self.deltaXSlider.redrawSurface()
+        canvasSurface.redrawSurface()
 
     def renewUntilX(self):
         try:
-            self.untilXSlider.value = MathUtil.clamp(float(self.untilXTextField.text), 0.0, 1.0)
+            self.untilXSlider.value = MathUtil.clamp(float(self.untilXTextField.text) / 20, 0.0, 1.0)
         except:
-            self.untilXSlider.value = 0.5
-            self.untilXTextField.text = 0.5
+            self.untilXSlider.value = 5
+            self.untilXTextField.text = "5"
         self.untilXSlider.updateSliderPos()
         self.untilXSlider.redrawSurface()
+        canvasSurface.redrawSurface()
+
+    def renewY0(self):
+        try:
+            canvasSurface.y0 = float(self.initialYTextField.text)
+        except:
+            self.initialYTextField.text = "5"
+            canvasSurface.y0 = 5
+        canvasSurface.redrawSurface()
+
+canvasSurface = CanvasSurface()
+mainSurface = MainSurface()
 
 def initRoom():
-    Updater.insertUpdate(CanvasSurface())
-    Updater.insertUpdate(MainSurface())
+    Updater.insertUpdate(canvasSurface)
+    Updater.insertUpdate(mainSurface)

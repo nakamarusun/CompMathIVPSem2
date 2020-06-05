@@ -38,4 +38,8 @@ def lerp(val, min, max):
     return (min + val * (max - min))
 
 def invLerp(val, min, max):
-    return ((val - min) / (max - min))
+    try:
+        return ((val - min) / (max - min))
+    except:
+        GVar.divisionByZero = True
+        return 0

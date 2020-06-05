@@ -10,6 +10,8 @@ defFont18 = pygame.font.SysFont("Calibri", 18, False, False, None)
 defFont24 = pygame.font.SysFont("Calibri", 24, False, False, None)
 defFont18Bold = pygame.font.SysFont("Calibri", 18, True, False, None)
 
+defFont24Bold = pygame.font.SysFont("Calibri", 24, True, False, None)
+
 mainScreenBuffer = None
 isVideoResized = False
 
@@ -21,14 +23,18 @@ events = []
 
 framesSinceStart = 0
 
+divisionByZero = False
+
 def update():
 
     global mousePos
     global mouseState
     global mouseStateSingle
     global isVideoResized
+    global divisionByZero
 
     isVideoResized = False
+    divisionByZero = False
     mousePos = pygame.mouse.get_pos()
 
     tempMouseState = pygame.mouse.get_pressed()
