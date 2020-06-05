@@ -33,9 +33,9 @@ class CanvasSurface():
 
     def updateFunction(self):
         self.xArr, self.yArr = MathUtil.IVP.compute(self.function, self.h, self.until, self.y0)
-        self.yMax = max(self.yArr)
-        self.yMin = min(self.yArr)
-        print(self.xArr, "\n", self.yArr)
+        self.yMax = max(self.yArr) + 1
+        self.yMin = min(self.yArr) - 1
+        # print(self.xArr, "\n", self.yArr)
         print(self.yMin, "\n", self.yMax)
 
     def redrawSurface(self):
@@ -52,12 +52,28 @@ class CanvasSurface():
             pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the dot in each of the delta x's
             pointBefore = pointAfter # Sets the previous dot to the current dot.
 
+    def drawNumbers(self):
+        yNumbers = (self.yMax - self.yMin) / 10
+        counter = self.yMin
+        for i in range(10):
+            GVar.mainScreenBuffer.blit(GVar.defFont.render(str(round(counter, 3)) + " -", True, (0, 0, 0)),
+            [((1 - self.ratio[0])/2 * GVar.resolution[0]) - 40, (((0.1 + self.ratio[1]) * GVar.resolution[1]) - (MathUtil.invLerp(counter, self.yMin, self.yMax) * (GVar.resolution[1] * self.ratio[1])) - 7)])
+            counter += yNumbers
+
+        xNumbers = (self.xArr[-1] - self.xArr[0]) / 10
+        counter = self.xArr[0]
+        for i in range(11):
+            GVar.mainScreenBuffer.blit(GVar.defFont.render("|" + str(round(counter, 3)), True, (0, 0, 0)),
+            [((1 - self.ratio[0])/2 * GVar.resolution[0]) + (MathUtil.invLerp(counter, self.xArr[0], self.xArr[-1]) * GVar.resolution[0] * self.ratio[0]) - 3, ((0.1 + self.ratio[1]) * GVar.resolution[1])])
+            counter += xNumbers
+
     def update(self):
         if (GVar.isVideoResized):
             self.redrawSurface() # If program is resized, change the size of the canvas surface
 
         # Drawing end
         GVar.mainScreenBuffer.blit(self.functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * self.ratio[0] / 2), GVar.resolution[1] * 0.1]) # Draws into the main screen buffer in the middle.
+        self.drawNumbers()
 
 class MainSurface():
 
