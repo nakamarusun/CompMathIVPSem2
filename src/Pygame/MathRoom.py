@@ -7,6 +7,7 @@ from Pygame.Slider import Slider
 from Pygame.TextField import TextField
 from Pygame.TextLabel import TextLabel
 from Pygame.ToggleButton import ToggleButton
+import MathUtil
 
 
 class CanvasSurface():
@@ -36,6 +37,21 @@ class MainSurface():
 
     interactableList = []
 
+    deltaXSlider = None
+    untilXSlider = None
+
+    deltaXTextField = None
+    untilXTextField = None
+
+    functionTextField = None
+
+    initialYTextField = None
+
+    calculateButton = None
+
+    eulerToggle = None
+    rungeKuttaToggle = None
+
     def __init__(self):
         self.redrawAll()
 
@@ -48,51 +64,82 @@ class MainSurface():
         self.interactableList = []
 
         # Sliders
-        self.interactableList.append(Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.84], GVar.resolution[0] * 0.3, 50, (191, 233, 245), (141, 202, 235))) # Delta X Slider
-        self.interactableList.append(Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.91], GVar.resolution[0] * 0.3, 20, (252, 215, 251), (220, 141, 235), (142, 47, 189), (185, 51, 222))) # Until X Slider
+        self.deltaXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.84], GVar.resolution[0] * 0.3, 0.5, (191, 233, 245), (141, 202, 235))
+        self.interactableList.append(self.deltaXSlider) # Delta X Slider
+        self.untilXSlider = Slider(GVar.mainScreenBuffer, [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.91], GVar.resolution[0] * 0.3, 0.2, (252, 215, 251), (220, 141, 235), (142, 47, 189), (185, 51, 222))
+        self.interactableList.append(self.untilXSlider) # Until X Slider
 
         # Slider Text
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Delta X:", [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.82])) # Delta X Text
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Until X:", [GVar.resolution[0] * 0.075, GVar.resolution[1] * 0.89])) # Until X Text
 
         # Slider TextField
-        self.interactableList.append(TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.84 - 3], GVar.defFont)) # Delta X TextField
-        self.interactableList.append(TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.91 - 3], GVar.defFont)) # Until X TextField
+        self.deltaXTextField = TextField(self.renewXSlider,
+         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.84 - 3], GVar.defFont)
+        self.interactableList.append(self.deltaXTextField) # Delta X TextField
+        self.untilXTextField = TextField(self.renewUntilX,
+         GVar.mainScreenBuffer, 65, [GVar.resolution[0] * 0.4, GVar.resolution[1] * 0.91 - 3], GVar.defFont)
+        self.interactableList.append(self.untilXTextField) # Until X TextField
 
         # Function Text
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Function:", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.84 - 2], GVar.defFont18Bold))
 
         # Function TextField
-        self.interactableList.append(TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18))
+        self.functionTextField = TextField(lambda : print("Pressed"),
+         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18)
+        self.interactableList.append(self.functionTextField)
 
         # Initial y Text
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "y(0):", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.91 - 2], GVar.defFont18))
 
         # Initial y TextField
-        self.interactableList.append(TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, GVar.resolution[0] * 0.075, [GVar.resolution[0] * 0.56, GVar.resolution[1] * 0.91 - 9], GVar.defFont18))
+        self.initialYTextField = TextField(lambda : print("Pressed"),
+         GVar.mainScreenBuffer, GVar.resolution[0] * 0.075, [GVar.resolution[0] * 0.56, GVar.resolution[1] * 0.91 - 9], GVar.defFont18)
+        self.interactableList.append(self.initialYTextField)
 
         # Calculate Button
-        self.interactableList.append(Button(lambda : print("Calculated"),
-         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.83, GVar.resolution[1] * 0.91 - 9], "CALCULATE", GVar.defFont, [GVar.resolution[0] * 0.095, 29], (219, 42, 110), True, (227, 64, 145)))
+        self.calculateButton = Button(lambda : print("Calculated"),
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.83, GVar.resolution[1] * 0.91 - 9], "CALCULATE", GVar.defFont, [GVar.resolution[0] * 0.095, 29], (219, 42, 110), True, (227, 64, 145))
+        self.interactableList.append(self.calculateButton)
 
         # Toggle buttons for calculation Methods
-        self.interactableList.append(ToggleButton(lambda : print("Calculated"),
-         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65, GVar.resolution[1] * 0.91 - 9], "Euler", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104)))
-        self.interactableList.append(ToggleButton(lambda : print("Calculated"),
-         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "Runge-Kutta", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104)))
-
-
+        self.eulerToggle = ToggleButton(lambda : print("Calculated"),
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65, GVar.resolution[1] * 0.91 - 9], "Euler", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
+        self.interactableList.append(self.eulerToggle)
+        self.rungeKuttaToggle = ToggleButton(lambda : print("Calculated"),
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "RungeKutta", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
+        self.interactableList.append(self.rungeKuttaToggle)
 
     def update(self):
+        # Do all checks here
+
+        if (self.deltaXSlider.dragged):
+            self.deltaXTextField.text = str(round(self.deltaXSlider.value, 3))
+        # End actions
+
         if (GVar.isVideoResized):
             self.redrawAll()
         # Draws buttons and detects any button press
         for interactable in self.interactableList:
             interactable.update()
+
+    def renewXSlider(self):
+        try:
+            self.deltaXSlider.value = MathUtil.clamp(float(self.deltaXTextField.text), 0.0, 1.0)
+        except:
+            self.deltaXSlider.value = 0.5
+            self.deltaXTextField.text = 0.5
+        self.deltaXSlider.updateSliderPos()
+        self.deltaXSlider.redrawSurface()
+
+    def renewUntilX(self):
+        try:
+            self.untilXSlider.value = MathUtil.clamp(float(self.untilXTextField.text), 0.0, 1.0)
+        except:
+            self.untilXSlider.value = 0.5
+            self.untilXTextField.text = 0.5
+        self.untilXSlider.updateSliderPos()
+        self.untilXSlider.redrawSurface()
 
 def initRoom():
     Updater.insertUpdate(CanvasSurface())

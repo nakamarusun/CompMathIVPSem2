@@ -32,6 +32,8 @@ class TextField:
 
     enterFunc = None # Function to run when enter is pressed here.
 
+    textBefore = text
+
     def __init__(self, enterFunc, surface, length, coords, font, backgroundColor=(245, 245, 245), textColor=(0, 0, 0), margin=[5,5], initText=""):
 
         self.length = length
@@ -51,6 +53,7 @@ class TextField:
         self.enterFunc = enterFunc
 
         self.text = initText
+        self.textBefore = self.text
         
         self.redrawSurface()
 
@@ -150,5 +153,8 @@ class TextField:
             if (blink):
                 pygame.draw.line(self.surface, self.textColor, [self.xCursorPos + self.margin[0], self.margin[1]], [self.xCursorPos + self.margin[0], self.margin[1] + self.font.get_height()], 2)
 
+        self.textBefore == self.text
+        if (not self._active and self.textBefore != self.text):
+            self.redrawSurface()
 
         self.surfaceToDraw.blit(self.surface, self.coords) # Draw to screen
