@@ -15,7 +15,7 @@ class IVP:
         for i in range(int(until / h)):
             curX += h
             x = curX
-            curY = curY + (h * f(curX))
+            curY = curY + (h * eval(f))
             xVal.append(curX)
             yVal.append(curY)
 

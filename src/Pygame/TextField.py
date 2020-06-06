@@ -28,8 +28,6 @@ class TextField:
 
     xCursorPos = 0 # Position of the cursor in the x axis
 
-    buttonHeld = False # Whether the arrow button or the backspace is active.
-
     enterFunc = None # Function to run when enter is pressed here.
 
     textBefore = text
@@ -98,7 +96,6 @@ class TextField:
                         if (len(self.text) != 0): # Checks if there is something in the text
                             self.text = self.text[0:self.cursorPos-1] + self.text[self.cursorPos:] # Deletes the text based on where the cursor position is.
                             self.cursorPos -= 1
-                            self.buttonHeld = "b"
 
                     elif (event.unicode == '\x16'): # Gets text from clipboard (ctrl+v)
                         # Tries to get a string from the clipboard. If failed, then the text will be empty.
@@ -111,11 +108,9 @@ class TextField:
 
                     elif (event.key == pygame.K_LEFT): # Moves cursor to the left
                         self.cursorPos = clamp(self.cursorPos - 1, 0, len(self.text))
-                        self.buttonHeld = "l"
 
                     elif (event.key == pygame.K_RIGHT): # Moves cursor to the right
                         self.cursorPos = clamp(self.cursorPos + 1, 0, len(self.text))
-                        self.buttonHeld = "r"
 
                     elif (event.unicode == '\r' or event.unicode == '\n'): # If enter is clicked
                         self.enterFunc()
@@ -125,18 +120,7 @@ class TextField:
                         self.cursorPos += 1
 
                     blink = True # Sets blink to true if any key is pressed
-                elif (event.type == pygame.KEYUP):
-                    self.buttonHeld = False
 
-            if (self.buttonHeld != False and (GVar.framesSinceStart % 8 == 0)):
-                blink = True
-                if (self.buttonHeld == "l"):
-                    self.cursorPos = clamp(self.cursorPos - 1, 0, len(self.text))
-                elif (self.buttonHeld == "r"):
-                    self.cursorPos = clamp(self.cursorPos + 1, 0, len(self.text))
-                else:
-                    self.text = self.text[0:self.cursorPos-1] + self.text[self.cursorPos:] # Deletes the text based on where the cursor position is.
-                    self.cursorPos -= 1
 
             # Moves the text location in the x axis, based on the cursor relative position in the text field.
             if (self.xCursorPos > self.length * 0.75):

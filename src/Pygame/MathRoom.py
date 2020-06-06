@@ -9,13 +9,15 @@ from Pygame.TextLabel import TextLabel
 from Pygame.ToggleButton import ToggleButton
 import MathUtil
 import math
+import string
 
 class CanvasSurface():
 
     ratio = []
     functionCanvasSurface = None
 
-    function = lambda self, x : x**2 + 6*x + 9
+    # DEFAULT VALUES
+    function = "x**2 + 6*x + 9"
     y0 = 2
     until = 5
     h = 1
@@ -49,6 +51,9 @@ class CanvasSurface():
         pygame.draw.rect(self.functionCanvasSurface, (0, 0, 0), self.functionCanvasSurface.get_rect(), 1) # Puts a white border in the canvas
         # Do all drawing here
 
+        # Draws the actual value
+
+        # Draws the actual IVP Function
         pointBefore = [ 0, self.ratio[1] * GVar.resolution[1] * (1 - MathUtil.invLerp(self.yArr[0], self.yMin, self.yMax)) ] # Sets the first dot of the graphic
         for i in range(len(self.xArr) - 1):
             pointAfter = [ MathUtil.invLerp(self.xArr[i + 1], self.xArr[0], self.xArr[-1]) * GVar.resolution[0] * self.ratio[0], ( 1 - MathUtil.invLerp(self.yArr[i + 1], self.yMin, self.yMax)) * GVar.resolution[1] * self.ratio[1] ] # Counts the current dot.
@@ -70,7 +75,7 @@ class CanvasSurface():
         # Draws the number in the x axis, 10 numbers
         xNumbers = (self.xArr[-1] - self.xArr[0]) / 10
         counter = self.xArr[0]
-        for i in range(11):
+        for i in range(10 + 1):
             GVar.mainScreenBuffer.blit(GVar.defFont.render("|" + str(round(counter, 3)), True, (0, 0, 0)),
             [((1 - self.ratio[0])/2 * GVar.resolution[0]) + (MathUtil.invLerp(counter, self.xArr[0], self.xArr[-1]) * GVar.resolution[0] * self.ratio[0]) - 3, ((0.1 + self.ratio[1]) * GVar.resolution[1])])
             counter += xNumbers
@@ -101,6 +106,8 @@ class MainSurface():
 
     eulerToggle = None
     rungeKuttaToggle = None
+
+    functionError = None # If the inputted function by the user cannot be parsed / produces an error, print this message.
 
     def __init__(self):
         self.redrawAll()
@@ -135,8 +142,8 @@ class MainSurface():
         self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Function:", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.84 - 2], GVar.defFont18Bold))
 
         # Function TextField
-        self.functionTextField = TextField(lambda : print("Pressed"),
-         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18)
+        self.functionTextField = TextField(self.calculate,
+         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18, initText=canvasSurface.function)
         self.interactableList.append(self.functionTextField)
 
         # Initial y Text
@@ -148,7 +155,7 @@ class MainSurface():
         self.interactableList.append(self.initialYTextField)
 
         # Calculate Button
-        self.calculateButton = Button(lambda : print("Calculated"),
+        self.calculateButton = Button(self.calculate,
          GVar.mainScreenBuffer, [GVar.resolution[0] * 0.83, GVar.resolution[1] * 0.91 - 9], "CALCULATE", GVar.defFont, [GVar.resolution[0] * 0.095, 29], (219, 42, 110), True, (227, 64, 145))
         self.interactableList.append(self.calculateButton)
 
@@ -190,8 +197,13 @@ class MainSurface():
         for interactable in self.interactableList:
             interactable.update()
 
+        # Checks if there is any division by zero
         if (GVar.divisionByZero):
             GVar.mainScreenBuffer.blit(GVar.defFont24Bold.render("ERROR, DIVISION BY ZERO. CHANGE VALUE", True, (255, 0, 0)), [20, 20])
+
+        # Checks if there is any function error
+        if (self.functionError != None):
+            GVar.mainScreenBuffer.blit(GVar.defFont24Bold.render(self.functionError, True, (255, 0, 0)), [20, 50])
 
     def renewXSlider(self):
         try:
@@ -221,6 +233,50 @@ class MainSurface():
         except:
             self.initialYTextField.text = "5"
             canvasSurface.y0 = 5
+        canvasSurface.redrawSurface()
+
+    def calculate(self):
+        fun = self.functionTextField.text # Checks the function inputted by the user
+
+        allowedCharacters = "1234567890+-/*xX^ " # Sets a library of allowed characters
+        # Checks if there is a character outside the allowed ones.
+        errorParse = False
+        for char in fun:
+            if (char not in allowedCharacters):
+                self.functionError = "Illegal character in function text field"
+                errorParse = True
+                break
+
+        if (errorParse): return
+
+        # Parses the text to real equation
+        # Strips any whitespace
+        newFun = ""
+        for char in fun:
+            if (char != " "):
+                newFun += char
+
+        for i in range(len(newFun)):
+            try:
+                if (newFun[i] in string.digits and newFun[i+1] == "x"):
+                    newFun = newFun[:i + 1] + "*" + newFun[i + 1:] # Adds asterisk to x with no asterisk
+                elif (newFun[i] == "^"):
+                    newFun = newFun[:i] + "**" + newFun[i + 1:] # Changes ^ to double asterisk
+            except:
+                pass
+
+        # Tries to calculate with the new function. If fail, throw error
+        try:
+            x = 2
+            eval(newFun)
+        except:
+            self.functionError = "Function Error"
+            return
+
+        # At this point, the function is done parsing. Sets all of the function.
+        canvasSurface.function = newFun # Sets the function as the new function
+        self.functionError = None # Sets that no error has happened
+
         canvasSurface.redrawSurface()
 
 canvasSurface = CanvasSurface()
