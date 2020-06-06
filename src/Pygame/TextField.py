@@ -3,7 +3,7 @@ import Pygame.GlobalVariables as GVar
 import math
 from MathUtil import clamp
 from time import time
-from tkinter import Tk
+import pyperclip as pc
 
 class TextField:
 
@@ -100,7 +100,7 @@ class TextField:
                     elif (event.unicode == '\x16'): # Gets text from clipboard (ctrl+v)
                         # Tries to get a string from the clipboard. If failed, then the text will be empty.
                         try:
-                            text = Tk().clipboard_get()
+                            text = pc.paste()
                             self.text = self.text[0:self.cursorPos] + text + self.text[self.cursorPos:]
                             self.cursorPos += len(text)
                         except:
