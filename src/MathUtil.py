@@ -1,4 +1,5 @@
 import Pygame.GlobalVariables as GVar
+import math
 
 class IVP:
     def f(x: float):
@@ -15,6 +16,7 @@ class IVP:
         for i in range(int(until / h)):
             curX += h
             x = curX
+            y = yVal[-1]
             curY = curY + (h * eval(f))
             xVal.append(curX)
             yVal.append(curY)

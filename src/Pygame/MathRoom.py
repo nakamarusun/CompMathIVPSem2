@@ -17,10 +17,10 @@ class CanvasSurface():
     functionCanvasSurface = None
 
     # DEFAULT VALUES
-    function = "x**2 + 6*x + 9"
-    y0 = 2
+    function = "x**2 - 4*y"
+    y0 = 1
     until = 5
-    h = 1
+    h = 0.1
 
     xArr = [] # The x plot in the graph.
     yArr = [] # The y plot in the graph.
@@ -40,11 +40,14 @@ class CanvasSurface():
         range = self.yMax - self.yMin
         self.yMax += range * 0.05
         self.yMin -= range * 0.05
-        # print(self.xArr, "\n", self.yArr)
+        # print(self.xArr, "\n\n", self.yArr)
         # print(self.yMin, "\n", self.yMax)
 
     def redrawSurface(self):
-        self.updateFunction()
+        try:
+            self.updateFunction()
+        except OverflowError:
+            mainSurface.functionError = "Resulting number too large !"
         # Creates a new function canvas surface with 85% width size and 50% height size
         self.functionCanvasSurface = pygame.Surface((GVar.resolution[0] * self.ratio[0], GVar.resolution[1] * self.ratio[1]))
         self.functionCanvasSurface.fill((255, 255, 255)) # Clears the surface with white
@@ -139,7 +142,7 @@ class MainSurface():
         self.interactableList.append(self.untilXTextField) # Until X TextField
 
         # Function Text
-        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Function:", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.84 - 2], GVar.defFont18Bold))
+        self.interactableList.append(TextLabel(GVar.mainScreenBuffer, "Function(y'):", [GVar.resolution[0] * 0.51, GVar.resolution[1] * 0.84 - 2], GVar.defFont18Bold))
 
         # Function TextField
         self.functionTextField = TextField(self.calculate,
@@ -164,7 +167,7 @@ class MainSurface():
          GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65, GVar.resolution[1] * 0.91 - 9], "Euler", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
         self.interactableList.append(self.eulerToggle)
         self.rungeKuttaToggle = ToggleButton(lambda : print("Calculated"),
-         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "RungeKutta", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
+         GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "4th RK", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
         self.interactableList.append(self.rungeKuttaToggle)
 
     def update(self):
@@ -238,7 +241,7 @@ class MainSurface():
     def calculate(self):
         fun = self.functionTextField.text # Checks the function inputted by the user
 
-        allowedCharacters = "1234567890+-/*xX^ " # Sets a library of allowed characters
+        allowedCharacters = "1234567890+-/*x^ ()ey." # Sets a library of allowed characters
         # Checks if there is a character outside the allowed ones.
         errorParse = False
         for char in fun:
@@ -258,16 +261,19 @@ class MainSurface():
 
         for i in range(len(newFun)):
             try:
-                if (newFun[i] in string.digits and newFun[i+1] == "x"):
-                    newFun = newFun[:i + 1] + "*" + newFun[i + 1:] # Adds asterisk to x with no asterisk
+                if ((newFun[i] in (string.digits + "e)") and (newFun[i+1] == "x" or newFun[i+1] == "y")) or ((newFun[i] == "x" or newFun[i] == "y") and newFun[i+1] == "(")): # Adds asterisk to numbers, e and ")" with no asterisk, and x or y with "("
+                    newFun = newFun[:i + 1] + "*" + newFun[i + 1:]
                 elif (newFun[i] == "^"):
                     newFun = newFun[:i] + "**" + newFun[i + 1:] # Changes ^ to double asterisk
+                if (newFun[i] == "e"):
+                    newFun = newFun[:i] + "math.e" + newFun[i + 1:] # Changes e to actual variable
             except:
                 pass
 
         # Tries to calculate with the new function. If fail, throw error
         try:
-            x = 2
+            x = 2 # Bogus values to check whether function works correctly
+            y = 3
             eval(newFun)
         except:
             self.functionError = "Function Error"
