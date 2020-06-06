@@ -7,6 +7,7 @@ from Pygame.Slider import Slider
 from Pygame.TextField import TextField
 from Pygame.TextLabel import TextLabel
 from Pygame.ToggleButton import ToggleButton
+from Pygame.ToggleList import ToggleList
 import MathUtil
 import math
 import string
@@ -24,7 +25,7 @@ class CanvasSurface():
 
     # 0 = Euler
     # 1 = 4th Order Runge Kutta
-    functionMode = 1
+    functionMode = 0
 
     xArr = [] # The x plot in the graph.
     yArr = [] # The y plot in the graph.
@@ -67,7 +68,7 @@ class CanvasSurface():
             pygame.draw.aaline(self.functionCanvasSurface, (0, 0, 0), pointBefore, pointAfter, 2) # Draws line from the previous dot to the dot after it
 
             # pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the dot in each of the delta x's, non antialiased circle
-            
+
             pygame.gfxdraw.aacircle(self.functionCanvasSurface, round(pointBefore[0]), round(pointBefore[1]), 4, (230, 120, 0)) # Draws circle anti-aliased outline.
             pygame.gfxdraw.filled_circle(self.functionCanvasSurface, round(pointBefore[0]), round(pointBefore[1]), 4, (230, 120, 0)) # Draws circle
 
@@ -100,10 +101,14 @@ class CanvasSurface():
         GVar.mainScreenBuffer.blit(self.functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * self.ratio[0] / 2), GVar.resolution[1] * 0.1]) # Draws into the main screen buffer in the middle.
         self.drawNumbers()
 
+    def setFunctionMode(self, mode):
+        self.functionMode = mode
+
 class MainSurface():
 
     interactableList = []
 
+    # Interactable object list
     deltaXSlider = None
     untilXSlider = None
 
@@ -118,6 +123,8 @@ class MainSurface():
 
     eulerToggle = None
     rungeKuttaToggle = None
+
+    algorithmToggleList = None
 
     functionError = None # If the inputted function by the user cannot be parsed / produces an error, print this message.
 
@@ -172,12 +179,16 @@ class MainSurface():
         self.interactableList.append(self.calculateButton)
 
         # Toggle buttons for calculation Methods
-        self.eulerToggle = ToggleButton(lambda : print("Calculated"),
+        self.eulerToggle = ToggleButton(lambda : canvasSurface.setFunctionMode(0),
          GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65, GVar.resolution[1] * 0.91 - 9], "Euler", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
         self.interactableList.append(self.eulerToggle)
-        self.rungeKuttaToggle = ToggleButton(lambda : print("Calculated"),
+        self.rungeKuttaToggle = ToggleButton(lambda : canvasSurface.setFunctionMode(1),
          GVar.mainScreenBuffer, [GVar.resolution[0] * 0.65 + GVar.resolution[0] * 0.085, GVar.resolution[1] * 0.91 - 9], "4th RK", GVar.defFont, [GVar.resolution[0] * 0.085, 29/2], (144, 62, 237), True, (116, 57, 227), (219, 22, 104))
         self.interactableList.append(self.rungeKuttaToggle)
+
+        # Toggle button controller
+        self.algorithmToggleList = ToggleList([self.eulerToggle, self.rungeKuttaToggle], self.eulerToggle, self.changeFunctionMode)
+        self.interactableList.append(self.algorithmToggleList)
 
     def update(self):
         # Do all checks here
@@ -205,6 +216,7 @@ class MainSurface():
 
         if (GVar.isVideoResized):
             self.redrawAll()
+
         # Draws buttons and detects any button press
         for interactable in self.interactableList:
             interactable.update()
@@ -216,6 +228,7 @@ class MainSurface():
         # Checks if there is any function error
         if (self.functionError != None):
             GVar.mainScreenBuffer.blit(GVar.defFont24Bold.render(self.functionError, True, (255, 0, 0)), [20, 50])
+
 
     def renewXSlider(self):
         try:
@@ -270,7 +283,7 @@ class MainSurface():
 
         for i in range(len(newFun)):
             try:
-                if ((newFun[i] in (string.digits + "e)") and (newFun[i+1] == "x" or newFun[i+1] == "y")) or ((newFun[i] == "x" or newFun[i] == "y") and newFun[i+1] == "(")): # Adds asterisk to numbers, e and ")" with no asterisk, and x or y with "("
+                if ((newFun[i] in (string.digits + "e)") and (newFun[i+1] == "x" or newFun[i+1] == "y" or newFun[i+1] == "e")) or ((newFun[i] == "x" or newFun[i] == "y") and newFun[i+1] == "(")): # Adds asterisk to numbers, e and ")" with no asterisk, and x or y with "("
                     newFun = newFun[:i + 1] + "*" + newFun[i + 1:]
                 elif (newFun[i] == "^"):
                     newFun = newFun[:i] + "**" + newFun[i + 1:] # Changes ^ to double asterisk
@@ -293,6 +306,10 @@ class MainSurface():
         self.functionError = None # Sets that no error has happened
 
         canvasSurface.redrawSurface()
+
+    def changeFunctionMode(self):
+        canvasSurface.redrawSurface()
+        canvasSurface.update()
 
 canvasSurface = CanvasSurface()
 mainSurface = MainSurface()
