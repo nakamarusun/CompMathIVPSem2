@@ -19,7 +19,7 @@ class IVP:
         curX = 0
         curY = y0
 
-        functionEval = eval("lambda x, y : " + f) # Convers the specified string to a python mathematical formula. It is of utmost importance for the string to be python-compliant, so that it doesn't run into any errors.
+        functionEval = eval("lambda x, y : " + f) # Converts the specified string to a python mathematical formula. It is of utmost importance for the string to be python-compliant, so that it doesn't run into any errors.
 
         chosenFunction = IVP.euler # Default is euler
 
@@ -29,9 +29,9 @@ class IVP:
             chosenFunction = IVP.rk4
 
         for i in range(int(until / h)):
-            curX += h # Adds the current x by the specified h
             # Calculates the next y value based on the chosen algorithm
             curY = chosenFunction(curX, curY, h, functionEval)
+            curX += h # Adds the current x by the specified h
             # Appends to array
             xVal.append(curX)
             yVal.append(curY)
@@ -76,3 +76,21 @@ def invLerp(val, min, max):
     except:
         GVar.divisionByZero = True
         return 0
+
+# import numpy as np
+
+# def eulerOp(f, x, y0):
+#     n = x.size
+#     y = np.zeros((n))
+#     y[0] = y0
+#     dx = x[1] - x[0]
+#     for i in range(n - 1):
+#         print(f(x[i], y[i]))
+#         y[i+1] = y[i] + dx * f(x[i], y[i])
+#     return y
+
+# f = lambda x, y: -2*x**3+12*x**2-20*x+8.5
+# y0 = 1
+# x = np.linspace(0, 1, 11)
+# print(eulerOp(f, x, y0))
+# print(IVP.compute("-2*x**3+12*x**2-20*x+8.5", 0.1, 1.0, 1, 0))

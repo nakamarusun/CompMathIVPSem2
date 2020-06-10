@@ -6,6 +6,7 @@ pygame.font.init()
 resolution = [800, 600]
 # defFont = pygame.font.Font(pygame.font.get_default_font(), 12)
 defFont = pygame.font.SysFont("Calibri", 14, False, False, None)
+defFontBold = pygame.font.SysFont("Calibri", 14, True, False, None)
 defFont18 = pygame.font.SysFont("Calibri", 18, False, False, None)
 defFont24 = pygame.font.SysFont("Calibri", 24, False, False, None)
 defFont18Bold = pygame.font.SysFont("Calibri", 18, True, False, None)

@@ -11,6 +11,7 @@ from Pygame.ToggleList import ToggleList
 import MathUtil
 import math
 import string
+from time import time
 
 class CanvasSurface():
 
@@ -23,9 +24,15 @@ class CanvasSurface():
     until = 5
     h = 0.1
 
+    # Both is in miliseconds
+    calculationTime = 0 # Time to calculate the actual values
+    drawingTime = 0 # Time to draw the graph
+
     # 0 = Euler
     # 1 = 4th Order Runge Kutta
     functionMode = 0
+
+    finalValue = "[0, 0]"
 
     xArr = [] # The x plot in the graph.
     yArr = [] # The y plot in the graph.
@@ -39,26 +46,30 @@ class CanvasSurface():
         self.redrawSurface()
 
     def updateFunction(self):
+        start = time()
         self.xArr, self.yArr = MathUtil.IVP.compute(self.function, self.h, self.until, self.y0, self.functionMode)
         self.yMax = max(self.yArr)
         self.yMin = min(self.yArr)
         range = self.yMax - self.yMin
         self.yMax += range * 0.05
         self.yMin -= range * 0.05
+        self.calculationTime = time() - start
         # print(self.xArr, "\n\n", self.yArr)
         # print(self.yMin, "\n", self.yMax)
+        self.finalValue = "[" + str(round(self.xArr[-1], 6)) + " " + str(round(self.yArr[-1], 6)) + "]"
 
     def redrawSurface(self):
         try:
             self.updateFunction()
         except OverflowError:
             mainSurface.functionError = "Resulting number too large !"
+            self.finalValue = "[~, ~]"
         # Creates a new function canvas surface with 85% width size and 50% height size
         self.functionCanvasSurface = pygame.Surface((GVar.resolution[0] * self.ratio[0], GVar.resolution[1] * self.ratio[1]))
         self.functionCanvasSurface.fill((255, 255, 255)) # Clears the surface with white
         pygame.draw.rect(self.functionCanvasSurface, (0, 0, 0), self.functionCanvasSurface.get_rect(), 1) # Puts a white border in the canvas
         # Do all drawing here
-
+        start = time()
         # Draws the actual value
 
         # Draws the actual IVP Function
@@ -75,6 +86,7 @@ class CanvasSurface():
             pointBefore = pointAfter # Sets the previous dot to the current dot.
 
         pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the last dot
+        self.drawingTime = time() - start
 
     def drawNumbers(self):
         # Draws the number in the y axis, 20 numbers
@@ -99,6 +111,9 @@ class CanvasSurface():
 
         # Drawing end
         GVar.mainScreenBuffer.blit(self.functionCanvasSurface, [(GVar.resolution[0] / 2) - (GVar.resolution[0] * self.ratio[0] / 2), GVar.resolution[1] * 0.1]) # Draws into the main screen buffer in the middle.
+        GVar.mainScreenBuffer.blit(GVar.defFont.render("calc: " + str(self.calculationTime) + " ms", True, (0, 150, 0)), [GVar.resolution[0] * 0.06, GVar.resolution[1] * 0.05]) # Prints calculation time
+        GVar.mainScreenBuffer.blit(GVar.defFont.render("draw: " + str(self.drawingTime) + " ms", True, (0, 150, 0)), [GVar.resolution[0] * 0.06, GVar.resolution[1] * 0.075]) # Prints draw time
+        GVar.mainScreenBuffer.blit(GVar.defFontBold.render("Final value: " + self.finalValue, True, (0, 0, 0)), [GVar.resolution[0] * 0.75, GVar.resolution[1] * 0.075]) # Prints the final value
         self.drawNumbers()
 
     def setFunctionMode(self, mode):
@@ -281,7 +296,8 @@ class MainSurface():
             if (char != " "):
                 newFun += char
 
-        for i in range(len(newFun)):
+        i = 0
+        while i < len(newFun):
             try:
                 if ((newFun[i] in (string.digits + "e)") and (newFun[i+1] == "x" or newFun[i+1] == "y" or newFun[i+1] == "e")) or ((newFun[i] == "x" or newFun[i] == "y") and newFun[i+1] == "(")): # Adds asterisk to numbers, e and ")" with no asterisk, and x or y with "("
                     newFun = newFun[:i + 1] + "*" + newFun[i + 1:]
@@ -291,6 +307,7 @@ class MainSurface():
                     newFun = newFun[:i] + "math.e" + newFun[i + 1:] # Changes e to actual variable
             except:
                 pass
+            i += 1
 
         # Tries to calculate with the new function. If fail, throw error
         try:
@@ -306,6 +323,8 @@ class MainSurface():
         self.functionError = None # Sets that no error has happened
 
         canvasSurface.redrawSurface()
+        print(canvasSurface.xArr)
+        print(canvasSurface.yArr)
 
     def changeFunctionMode(self):
         canvasSurface.redrawSurface()
