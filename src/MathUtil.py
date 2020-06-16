@@ -1,5 +1,7 @@
 import Pygame.GlobalVariables as GVar
 import math
+from numpy import sin, cos, tan
+from math import pi
 
 class IVP:
 
@@ -72,7 +74,11 @@ def lerp(val, min, max):
 def invLerp(val, min, max):
     # Inverse Linear Interpolation, to get a ratio of the value from the min to the max
     try:
-        return ((val - min) / (max - min))
+        res = ((val - min) / (max - min))
+        if (math.isnan(res)):
+            return 0
+        else:
+            return res
     except:
         GVar.divisionByZero = True
         return 0

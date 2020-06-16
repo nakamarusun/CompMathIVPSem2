@@ -13,6 +13,9 @@ import math
 import string
 from time import time
 
+from numpy import sin, cos, tan
+from math import pi
+
 class CanvasSurface():
 
     ratio = []
@@ -79,13 +82,12 @@ class CanvasSurface():
             pygame.draw.aaline(self.functionCanvasSurface, (0, 0, 0), pointBefore, pointAfter, 2) # Draws line from the previous dot to the dot after it
 
             # pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the dot in each of the delta x's, non antialiased circle
-
-            pygame.gfxdraw.aacircle(self.functionCanvasSurface, round(pointBefore[0]), round(pointBefore[1]), 4, (230, 120, 0)) # Draws circle anti-aliased outline.
-            pygame.gfxdraw.filled_circle(self.functionCanvasSurface, round(pointBefore[0]), round(pointBefore[1]), 4, (230, 120, 0)) # Draws circle
+            pygame.gfxdraw.aacircle(self.functionCanvasSurface, int(round(pointBefore[0])), int(round(pointBefore[1])), 4, (230, 120, 0)) # Draws circle anti-aliased outline.
+            pygame.gfxdraw.filled_circle(self.functionCanvasSurface, int(round(pointBefore[0])), int(round(pointBefore[1])), 4, (230, 120, 0)) # Draws circle
 
             pointBefore = pointAfter # Sets the previous dot to the current dot.
-
-        pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (round(pointBefore[0]), round(pointBefore[1])), 4) # Draws the last dot
+    
+        pygame.draw.circle(self.functionCanvasSurface, (230, 120, 0), (int(round(pointBefore[0])), int(round(pointBefore[1]))), 4) # Draws the last dot
         self.drawingTime = time() - start
 
     def drawNumbers(self):
@@ -177,7 +179,7 @@ class MainSurface():
 
         # Function TextField
         self.functionTextField = TextField(self.calculate,
-         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18, initText=canvasSurface.function)
+         GVar.mainScreenBuffer, GVar.resolution[0] * 0.285, [GVar.resolution[0] * 0.64, GVar.resolution[1] * 0.84 - 9], GVar.defFont18, initText="x^2 - 4y")
         self.interactableList.append(self.functionTextField)
 
         # Initial y Text
@@ -278,7 +280,7 @@ class MainSurface():
     def calculate(self):
         fun = self.functionTextField.text # Checks the function inputted by the user
 
-        allowedCharacters = "1234567890+-/*x^ ()ey." # Sets a library of allowed characters
+        allowedCharacters = "1234567890+-/*x^ ()ey.sincotap" # Sets a library of allowed characters
         # Checks if there is a character outside the allowed ones.
         errorParse = False
         for char in fun:
